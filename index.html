@@ -21,7 +21,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 500px; /* 最大幅を少し広くする */
+            max-width: 500px;
         }
         input, textarea {
             width: 100%;
@@ -29,7 +29,7 @@
             margin: 8px 0;
             border: 1px solid #ccc;
             border-radius: 4px;
-            font-size: 16px; /* フォントサイズを少し大きく */
+            font-size: 16px;
         }
         button {
             background-color: #4CAF50;
@@ -39,20 +39,10 @@
             width: 100%;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 16px; /* ボタンのフォントサイズも調整 */
+            font-size: 16px;
         }
         button:hover {
             background-color: #45a049;
-        }
-
-        /* レスポンシブ対応 */
-        @media screen and (max-width: 600px) {
-            .form-container {
-                padding: 15px; /* モバイルでは少し内側を広くする */
-            }
-            input, textarea, button {
-                font-size: 14px; /* モバイルでは少し小さめにする */
-            }
         }
     </style>
 </head>
@@ -72,29 +62,43 @@
     <script>
         document.getElementById('contactForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
-            // フォームのデータを取得
-            const formData = new FormData(e.target);
-            const data = new URLSearchParams();
-            for (const pair of formData) {
-                data.append(pair[0], pair[1]);
-            }
 
-            // Google Apps ScriptのウェブアプリURL
-            const scriptURL = "https://script.google.com/macros/s/AKfycbxJ3wC3bsVRkE7oNNR4oz4IeeBHTNy61gmdNwQ7P2LV9Y8J_n_-4i8qhc8jF4F7O9Vsug/exec";
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
 
-            // データを送信
-            try {
-                const response = await fetch(scriptURL, {
-                    method: 'POST',
-                    body: data,
-                });
-                const text = await response.text();
-                alert(text); // レスポンスを表示
-            } catch (error) {
-                console.error("Error:", error);
-                alert("データ送信中にエラーが発生しました。");
-            }
+                    // フォームのデータを取得
+                    const formData = new FormData(e.target);
+                    const data = new URLSearchParams();
+                    for (const pair of formData) {
+                        data.append(pair[0], pair[1]);
+                    }
+                    // 緯度と経度を追加
+                    data.append("latitude", latitude);
+                    data.append("longitude", longitude);
+
+                    // Google Apps ScriptのウェブアプリURL
+                    const scriptURL = "https://script.google.com/macros/s/AKfycbx5zSwfqbX72nR-KEJuZvD3wVFr37aznoU_5E2NdjUezr87K5IE73Q2qUg04nw969DC1g/exec";
+
+                    // データを送信
+                    try {
+                        const response = await fetch(scriptURL, {
+                            method: 'POST',
+                            body: data,
+                        });
+                        const text = await response.text();
+                        alert(text); // レスポンスを表示
+                    } catch (error) {
+                        console.error("データ送信中にエラーが発生しました。", error);
+                        alert("データ送信中にエラーが発生しました。");
+                    }
+                },
+                (error) => {
+                    console.error("位置情報の取得に失敗しました。", error);
+                    alert("位置情報の取得に失敗しました。");
+                }
+            );
         });
     </script>
 </body>
