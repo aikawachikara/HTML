@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>お問い合わせフォーム</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .form-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px; /* 最大幅を少し広くする */
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px; /* フォントサイズを少し大きく */
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px; /* ボタンのフォントサイズも調整 */
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* レスポンシブ対応 */
+        @media screen and (max-width: 600px) {
+            .form-container {
+                padding: 15px; /* モバイルでは少し内側を広くする */
+            }
+            input, textarea, button {
+                font-size: 14px; /* モバイルでは少し小さめにする */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>お問い合わせフォーム</h1>
+        <form id="contactForm">
+            <label for="name">お名前:</label>
+            <input type="text" id="name" name="name" required>
+            <label for="email">メールアドレス:</label>
+            <input type="email" id="email" name="email" required>
+            <label for="message">メッセージ:</label>
+            <textarea id="message" name="message" rows="4" required></textarea>
+            <button type="submit">送信</button>
+        </form>
+    </div>
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // フォームのデータを取得
+            const formData = new FormData(e.target);
+            const data = new URLSearchParams();
+            for (const pair of formData) {
+                data.append(pair[0], pair[1]);
+            }
+
+            // Google Apps ScriptのウェブアプリURL
+            const scriptURL = "https://script.google.com/macros/s/AKfycbxJ3wC3bsVRkE7oNNR4oz4IeeBHTNy61gmdNwQ7P2LV9Y8J_n_-4i8qhc8jF4F7O9Vsug/exec";
+
+            // データを送信
+            try {
+                const response = await fetch(scriptURL, {
+                    method: 'POST',
+                    body: data,
+                });
+                const text = await response.text();
+                alert(text); // レスポンスを表示
+            } catch (error) {
+                console.error("Error:", error);
+                alert("データ送信中にエラーが発生しました。");
+            }
+        });
+    </script>
+</body>
+</html>
